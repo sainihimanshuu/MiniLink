@@ -8,11 +8,13 @@ const asyncHandler =
       await func(req, res, next);
     } catch (error: any) {
       if (error instanceof ZodError) {
-        return res.status(400).json({ error: error });
+        res.status(400).json({ error: error });
+        return;
       }
-      return res
+      res
         .status(error.statusCode || 500)
         .json({ error: error || "internal server error" });
+      return;
     }
   };
 

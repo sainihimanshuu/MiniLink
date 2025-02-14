@@ -3,11 +3,13 @@ import dotenv from "dotenv";
 import authenticationRouter from "./routes/authentication.routes";
 import { PrismaClient } from "@prisma/client";
 import { Server } from "http";
+import cookieParser from "cookie-parser";
 
 const app = express();
 dotenv.config();
 const prisma = new PrismaClient();
 
+app.use(cookieParser());
 app.use("/api/authentication", authenticationRouter);
 
 let server: Server;
