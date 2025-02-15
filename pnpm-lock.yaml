@@ -85,7 +85,27 @@ importers:
         specifier: ^6.3.1
         version: 6.3.1(typescript@5.7.3)
 
-  apps/url-shortening-service: {}
+  apps/url-shortening-service:
+    dependencies:
+      '@prisma/client':
+        specifier: 6.3.1
+        version: 6.3.1(prisma@6.3.1(typescript@5.7.3))(typescript@5.7.3)
+      cookie-parser:
+        specifier: ^1.4.7
+        version: 1.4.7
+      express:
+        specifier: ^4.21.2
+        version: 4.21.2
+    devDependencies:
+      '@types/cookie-parser':
+        specifier: ^1.4.8
+        version: 1.4.8(@types/express@5.0.0)
+      '@types/express':
+        specifier: ^5.0.0
+        version: 5.0.0
+      prisma:
+        specifier: 6.3.1
+        version: 6.3.1(typescript@5.7.3)
 
   packages/eslint-config:
     devDependencies:
@@ -160,10 +180,17 @@ importers:
         version: 5.7.3
 
   packages/utils:
+    dependencies:
+      jsonwebtoken:
+        specifier: ^9.0.2
+        version: 9.0.2
     devDependencies:
       '@types/express':
         specifier: ^5.0.0
         version: 5.0.0
+      '@types/jsonwebtoken':
+        specifier: ^9.0.8
+        version: 9.0.8
       express:
         specifier: ^4.21.2
         version: 4.21.2
@@ -2192,6 +2219,7 @@ packages:
   typescript@5.7.3:
     resolution: {integrity: sha512-84MVSjMEHP+FQRPy3pX9sTVV/INIex71s9TL2Gm5FG/WG1SqXeKyZ0k7/blY/4FdOzI12CBy1vGc4og/eus0fw==}
     engines: {node: '>=14.17'}
+    hasBin: true
 
   uglify-js@3.19.3:
     resolution: {integrity: sha512-v3Xu+yuwBXisp6QYTcH4UbH+xYJXqnq2m/LtQVWKWzYc1iehYnLixoQDN9FH6/j9/oybfd6W9Ghwkl8+UMKTKQ==}

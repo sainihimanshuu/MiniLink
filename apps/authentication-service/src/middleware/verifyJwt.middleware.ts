@@ -3,12 +3,13 @@ import jwt from "jsonwebtoken";
 import { prisma } from "../index";
 import { User } from "@prisma/client";
 import asyncHandler from "@repo/utils/src/asyncHandler";
+import verifyJwt from "@repo/utils/src/verifyJwt";
 
 interface AuthRequest extends Request {
   user: User;
 }
 
-const verifyJwt = asyncHandler(
+const userAuthentication = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
     const accessToken = req.get("Authorization")?.split(" ")[1];
     if (!accessToken) {
@@ -16,12 +17,8 @@ const verifyJwt = asyncHandler(
       return;
     }
 
-    try {
-      var decoded = jwt.verify(
-        accessToken,
-        process.env.JWT_PUBLIC_KEY as string
-      ) as jwt.JwtPayload;
-    } catch (error) {
+    const decoded = await verifyJwt(accessToken);
+    if (!decoded) {
       res.status(403).send("Error while decoding token");
       return;
     }
@@ -40,4 +37,4 @@ const verifyJwt = asyncHandler(
   }
 );
 
-export default verifyJwt;
+export default userAuthentication;

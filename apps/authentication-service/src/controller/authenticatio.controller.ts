@@ -1,5 +1,5 @@
 import z from "zod";
-import { Request } from "express";
+import { Request, Response } from "express";
 import { prisma } from "../index";
 import asyncHandler from "@repo/utils/src/asyncHandler";
 import bcrypt from "bcrypt";
@@ -10,15 +10,22 @@ interface AuthRequest extends Request {
   user: User;
 }
 
+const privateKey = Buffer.from(process.env.PRIVATE_KEY!, "base64").toString(
+  "utf8"
+);
+const publicKey = Buffer.from(process.env.PUBLIC_KEY!, "base64").toString(
+  "utf8"
+);
+
 const generateAccessAndRefreshToken = async (user: User) => {
   const accessToken = jwt.sign(
     { id: user.id, email: user.email },
-    process.env.ACCESS_TOKEN_SECRET as Secret,
+    privateKey as Secret,
     { expiresIn: 60 * 60 }
   );
   const refreshToken = jwt.sign(
     { id: user.id, email: user.email },
-    process.env.REFRESH_TOKEN_SECRET as Secret,
+    privateKey as Secret,
     { expiresIn: "15d" }
   );
 
@@ -176,4 +183,14 @@ const refreshAccessToken = asyncHandler(async (req, res, _) => {
   return;
 });
 
-export { createUser, loginUser, logOut, refreshAccessToken };
+const getPublicKey = (req: Request, res: Response) => {
+  const internalApiKey = req.headers["internal-api-key"];
+  if (internalApiKey != process.env.INTERNAL_API_KEY) {
+    res.status(403).json({ message: "forbidden" });
+    return;
+  }
+
+  res.json({ publicKey: publicKey });
+};
+
+export { createUser, loginUser, logOut, refreshAccessToken, getPublicKey };
