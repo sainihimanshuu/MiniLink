@@ -6,22 +6,29 @@ import urlRouter from "./routes/url.routes";
 import { createClient } from "redis";
 
 const app = express();
+app.set("trust proxy", true);
 const prisma = new PrismaClient();
 
 app.use(cookieParser());
 app.use("/api/url", urlRouter);
 
 let server: Server;
-let client: ReturnType<typeof createClient>;
+let cacheClient: ReturnType<typeof createClient>;
+let queueClient: ReturnType<typeof createClient>;
 
 const connectToDatabase = async () => {
   try {
     await prisma.$connect();
-    client = createClient();
-    client.on("error", (err) =>
-      console.log("Redis client error in url-shortening-service", err)
+    cacheClient = createClient();
+    cacheClient.on("error", (err) =>
+      console.log("Redis cache client error in url-shortening-service", err)
     );
-    await client.connect();
+    await cacheClient.connect();
+    queueClient = createClient();
+    queueClient.on("error", (err) =>
+      console.log("Redis queue client error in url-shortening-service", err)
+    );
+    await queueClient.connect();
     server = app.listen(8081, () => {
       console.log("url-shortening-service listening on 8081");
     });
@@ -35,7 +42,8 @@ const exitHandler = () => {
     server.close(async () => {
       console.log("authentication service is shutting down");
       await prisma.$disconnect();
-      await client.disconnect();
+      await cacheClient.disconnect();
+      await queueClient.disconnect();
       process.exit(1);
     });
   } else {
@@ -55,4 +63,4 @@ process.on("SIGINT", uncaughtErrorHandler);
 
 connectToDatabase();
 
-export { prisma, client };
+export { prisma, cacheClient, queueClient };

@@ -1,11 +1,18 @@
 import asyncHandler from "@repo/utils/src/asyncHandler";
 import { customAlphabet } from "nanoid";
-import { prisma, client } from "../index";
+import { prisma, cacheClient, queueClient } from "../index";
 import { Request } from "express";
+import geoip from "geoip-lite";
+import { UAParser } from "ua-parser-js";
 
 interface AuthRequest extends Request {
   email: string;
 }
+
+type Location = {
+  city: string;
+  country: string;
+};
 
 const nanoid = customAlphabet(
   "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789",
@@ -62,10 +69,13 @@ const shortenUrl = asyncHandler(async (req, res, _) => {
   return;
 });
 
-const redirect = asyncHandler(async (req, res, _) => {
+const redirect = asyncHandler(async (req: Request, res, _) => {
   const { shortUrl } = req.params;
+  const { device } = UAParser(req.get("user-agent"));
+  const refererHeader = req.get("Referer");
+  const ip = req.ip;
 
-  let longUrl: string | null | undefined = await client.get(shortUrl);
+  let longUrl: string | null | undefined = await cacheClient.get(shortUrl);
   if (!longUrl) {
     const urlEntry = await prisma.shortUrl.findUnique({
       where: {
@@ -77,8 +87,33 @@ const redirect = asyncHandler(async (req, res, _) => {
       return;
     }
     longUrl = urlEntry?.longUrl;
-    await client.set(shortUrl!, longUrl!);
+    await cacheClient.set(shortUrl!, longUrl!);
   }
+
+  const deviceType = device.type === undefined ? "desktop" : device.type;
+  let location: Location = { city: "", country: "" };
+  if (ip) {
+    const lookup = geoip.lookup(ip);
+    if (lookup) {
+      location.city = lookup.city;
+      location.country = lookup.country;
+    }
+  }
+  let referer = "";
+  if (refererHeader) {
+    const url = new URL(refererHeader);
+    const parts = url.hostname.split(".");
+    parts.pop();
+    referer = parts.join(".");
+  }
+
+  const clickInfo = {
+    deviceType: deviceType,
+    location: location,
+    referer: referer,
+  };
+
+  await queueClient.lPush("messageQueue", JSON.stringify(clickInfo));
 
   res.redirect(longUrl);
   return;
@@ -108,7 +143,7 @@ const revokeUrl = asyncHandler(async (req, res, _) => {
     },
   });
 
-  await client.del(shortUrlToDelete);
+  await cacheClient.del(shortUrlToDelete);
 
   res.status(200).json({ message: "deleted successfully" });
   return;
