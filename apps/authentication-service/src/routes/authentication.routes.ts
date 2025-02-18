@@ -6,13 +6,13 @@ import {
   refreshAccessToken,
   getPublicKey,
 } from "../controller/authenticatio.controller";
-import verifyJwt from "../middleware/verifyJwt.middleware";
+import authenticaterUser from "../middleware/authenticaterUser.middleware";
 
 const router = Router();
 
 router.route("/createUser").post(createUser);
 router.route("/loginUser").post(loginUser);
-router.route("/logOut").post(verifyJwt, logOut);
+router.route("/logOut").post(authenticaterUser, logOut);
 router.route("/refreshAccessTokens").get(refreshAccessToken);
 router.route("/getPublickey").get(getPublicKey);
 

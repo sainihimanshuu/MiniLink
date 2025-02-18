@@ -13,16 +13,17 @@ datasource db {
   url  	    = env("DATABASE_URL")
 }
 
-model Email {
+model UserUrls {
   id        Int         @id @default(autoincrement())
+  email     String      @unique
   shortUrls ShortUrl[]  
 }
 
 model ShortUrl {
-  id        Int      @id @default(autoincrement())
-  shortUrl  String   @unique
+  id        Int       @id @default(autoincrement())
+  shortUrl  String    @unique
   longUrl   String
-  owner     Email    @relation(fields: [ownerId], references: [id], onDelete: Cascade)
-  ownerId   Int 
-  createdAt DateTime @default(now())
+  owner     UserUrls  @relation(fields: [ownerMail], references: [email], onDelete: Cascade)
+  ownerMail String 
+  createdAt DateTime  @default(now())
 }
