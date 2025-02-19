@@ -1,16 +1,15 @@
 import express from "express";
-import cookieParser from "cookie-parser";
 import { PrismaClient } from "@prisma/client";
-import { Server } from "http";
-import urlRouter from "./routes/url.routes";
 import { createClient } from "redis";
+import { Server } from "http";
+import cookieParser from "cookie-parser";
+import analyticsRouter from "./routes/analytics.routes";
 
 const app = express();
-app.set("trust proxy", true);
 const prisma = new PrismaClient();
 
 app.use(cookieParser());
-app.use("/api/url", urlRouter);
+app.use("api/analytics", analyticsRouter);
 
 let server: Server;
 let cacheClient: ReturnType<typeof createClient>;
@@ -20,27 +19,27 @@ const connectToDatabase = async () => {
   try {
     await prisma.$connect();
     cacheClient = createClient();
-    cacheClient.on("error", (err) =>
-      console.log("Redis cache client error in url-shortening-service", err)
-    );
+    cacheClient.on("error", (err) => {
+      console.log("Redis cache-client error in analytics-service", err);
+    });
     await cacheClient.connect();
+    server = app.listen(8082, () => {
+      console.log("analytics-service listening on 8082");
+    });
     queueClient = createClient();
     queueClient.on("error", (err) =>
       console.log("Redis queue client error in url-shortening-service", err)
     );
     await queueClient.connect();
-    server = app.listen(8081, () => {
-      console.log("url-shortening-service listening on 8081");
-    });
   } catch (error) {
-    console.log(`Prisma/redis connection error ${error}`);
+    console.log(`Prism/redis connection error ${error}`);
   }
 };
 
 const exitHandler = () => {
   if (server) {
     server.close(async () => {
-      console.log("authentication service is shutting down");
+      console.log("analytics service is shutting down");
       await prisma.$disconnect();
       await cacheClient.disconnect();
       await queueClient.disconnect();

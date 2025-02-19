@@ -75,8 +75,11 @@ const redirect = asyncHandler(async (req: Request, res, _) => {
   const refererHeader = req.get("Referer");
   const ip = req.ip;
 
-  let longUrl: string | null | undefined = await cacheClient.get(shortUrl);
-  if (!longUrl) {
+  let urlInfo;
+  const inCache = await cacheClient.get(shortUrl);
+  if (inCache) {
+    urlInfo = JSON.parse(inCache);
+  } else {
     const urlEntry = await prisma.shortUrl.findUnique({
       where: {
         shortUrl: shortUrl,
@@ -86,8 +89,13 @@ const redirect = asyncHandler(async (req: Request, res, _) => {
       res.status(404).json({ message: "Not found" });
       return;
     }
-    longUrl = urlEntry?.longUrl;
-    await cacheClient.set(shortUrl!, longUrl!);
+    const longUrl = urlEntry?.longUrl;
+    const ownerMail = urlEntry?.ownerMail;
+    urlInfo = {
+      longUrl,
+      ownerMail,
+    };
+    await cacheClient.set(shortUrl!, JSON.stringify(urlInfo));
   }
 
   const deviceType = device.type === undefined ? "desktop" : device.type;
@@ -108,14 +116,17 @@ const redirect = asyncHandler(async (req: Request, res, _) => {
   }
 
   const clickInfo = {
+    shortUrl: shortUrl,
+    urlOwnerMail: urlInfo.ownerMail,
     deviceType: deviceType,
     location: location,
     referer: referer,
+    clickDate: new Date(),
   };
 
   await queueClient.lPush("messageQueue", JSON.stringify(clickInfo));
 
-  res.redirect(longUrl);
+  res.redirect(urlInfo.longUrl);
   return;
 });
 

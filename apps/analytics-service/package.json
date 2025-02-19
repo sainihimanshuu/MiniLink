@@ -8,5 +8,17 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "description": ""
+  "description": "",
+  "devDependencies": {
+    "@types/express": "^5.0.0",
+    "prisma": "6.4.0"
+  },
+  "dependencies": {
+    "@prisma/client": "6.4.0",
+    "@repo/utils": "workspace:^",
+    "@types/cookie-parser": "^1.4.8",
+    "cookie-parser": "^1.4.7",
+    "express": "^4.21.2",
+    "redis": "^4.7.0"
+  }
 }

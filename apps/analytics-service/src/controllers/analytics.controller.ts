@@ -1,0 +1,3 @@
+const getAnalytics = () => {};
+
+export { getAnalytics };
