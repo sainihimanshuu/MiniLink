@@ -1,5 +1,6 @@
 import jwt from "jsonwebtoken";
 
+//store public key in some type of cache
 const getPublicKey = async () => {
   try {
     const response = await fetch(

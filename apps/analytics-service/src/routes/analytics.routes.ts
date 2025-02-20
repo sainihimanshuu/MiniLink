@@ -1,9 +1,18 @@
 import { Router } from "express";
 import userAuthentication from "../middlewares/userAuthentication.middleware";
-import { getAnalytics } from "../controllers/analytics.controller";
+import {
+  totalClicks,
+  clicksByCountry,
+  clicksByReferer,
+  clicksByDeviceType,
+} from "../controllers/analytics.controller";
 
 const router = Router();
 
-router.route("/getAnalytics").get(userAuthentication, getAnalytics);
+router.use(userAuthentication);
+router.route("/totalClicks/:shortUrl").get(totalClicks);
+router.route("/clicksByContry/:shortUrl/").get(clicksByCountry);
+router.route("/clicksByReferer/:shortUrl").get(clicksByReferer);
+router.route("/clicksByDeviceType/:shortUrl").get(clicksByDeviceType);
 
 export default router;

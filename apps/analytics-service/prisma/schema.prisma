@@ -18,6 +18,8 @@ model ShortUrl{
   shortUrl    String        @unique
   ownerMail   String 
   clickInfo   ClickInfo[]
+
+  @@index([shortUrl])
 }
 
 model ClickInfo {
@@ -29,4 +31,6 @@ model ClickInfo {
   url           ShortUrl  @relation(fields: [shortUrl], references: [shortUrl])
   shortUrl      String
   clickDate     DateTime
+
+  @@index([shortUrl])
 }

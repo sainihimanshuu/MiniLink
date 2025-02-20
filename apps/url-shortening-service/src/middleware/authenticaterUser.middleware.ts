@@ -2,7 +2,7 @@ import asyncHandler from "@repo/utils/src/asyncHandler";
 import verifyJwt from "@repo/utils/src/verifyJwt";
 import { Request, Response, NextFunction } from "express";
 
-interface AuthResponse extends Request {
+interface AuthRequest extends Request {
   email: string;
 }
 
@@ -20,7 +20,7 @@ const authenticateUser = asyncHandler(
       return;
     }
 
-    (req as AuthResponse).email = decoded.email;
+    (req as AuthRequest).email = decoded.email;
     next();
   }
 );
