@@ -4,6 +4,7 @@ import { createClient } from "redis";
 import { Server } from "http";
 import cookieParser from "cookie-parser";
 import analyticsRouter from "./routes/analytics.routes";
+import refereshCache from "./workers/refreshCache.worker";
 
 const app = express();
 const prisma = new PrismaClient();
@@ -14,6 +15,7 @@ app.use("api/analytics", analyticsRouter);
 let server: Server;
 let cacheClient: ReturnType<typeof createClient>;
 let queueClient: ReturnType<typeof createClient>;
+let refereshCacheInterval: NodeJS.Timeout;
 
 const connectToDatabase = async () => {
   try {
@@ -31,6 +33,7 @@ const connectToDatabase = async () => {
       console.log("Redis queue client error in url-shortening-service", err)
     );
     await queueClient.connect();
+    refereshCacheInterval = refereshCache();
   } catch (error) {
     console.log(`Prism/redis connection error ${error}`);
   }
@@ -43,6 +46,7 @@ const exitHandler = () => {
       await prisma.$disconnect();
       await cacheClient.disconnect();
       await queueClient.disconnect();
+      clearInterval(refereshCacheInterval);
       process.exit(1);
     });
   } else {
