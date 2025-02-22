@@ -1,0 +1,30 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model ClickInfo {
+  id         Int      @id @default(autoincrement())
+  deviceType String
+  city       String
+  country    String
+  referer    String
+  shortUrl   String
+  clickDate  DateTime
+  ShortUrl   ShortUrl @relation(fields: [shortUrl], references: [shortUrl])
+
+  @@index([shortUrl])
+}
+
+model ShortUrl {
+  id        Int         @id @default(autoincrement())
+  shortUrl  String      @unique
+  ownerMail String
+  ClickInfo ClickInfo[]
+
+  @@index([shortUrl])
+}

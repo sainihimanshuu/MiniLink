@@ -12,7 +12,7 @@ const prisma = new PrismaClient();
 app.use(cookieParser());
 app.use("/api/authentication", authenticationRouter);
 
-let server: Server;
+let server: Server | null = null;
 
 const connectToDatabase = async () => {
   try {
@@ -25,21 +25,31 @@ const connectToDatabase = async () => {
   }
 };
 
-const exitHandler = () => {
-  if (server) {
-    server.close(async () => {
-      console.log("authentication service is shutting down");
-      await prisma.$disconnect();
-      process.exit(1);
-    });
-  } else {
-    process.exit(1);
+const exitHandler = async () => {
+  try {
+    if (server) {
+      await new Promise((resolve) => {
+        if (server) {
+          server.close(resolve);
+        }
+      });
+    }
+  } catch (err) {
+    console.error("error in exit handler of authentication-service", err);
   }
 };
 
 const uncaughtErrorHandler = (error: Error) => {
   console.error(error);
-  exitHandler();
+  exitHandler()
+    .then(() => process.exit(1))
+    .catch((err) => {
+      console.error(
+        "error while hadling process errors in authentication-service",
+        err
+      );
+      process.exit(1);
+    });
 };
 
 process.on("uncaughtException", uncaughtErrorHandler);
@@ -47,6 +57,6 @@ process.on("unhandledRejection", uncaughtErrorHandler);
 process.on("SIGTERM", uncaughtErrorHandler);
 process.on("SIGINT", uncaughtErrorHandler);
 
-connectToDatabase();
+(async () => await connectToDatabase())();
 
 export { prisma };

@@ -116,6 +116,7 @@ const redirect = asyncHandler(async (req: Request, res, _) => {
   }
 
   const clickInfo = {
+    jobType: "click",
     shortUrl: shortUrl,
     urlOwnerMail: urlInfo.ownerMail,
     deviceType: deviceType,
@@ -155,6 +156,13 @@ const revokeUrl = asyncHandler(async (req, res, _) => {
   });
 
   await cacheClient.del(shortUrlToDelete);
+
+  const revokeInfo = {
+    jobType: "revokeUrl",
+    shortUrl: shortUrlToDelete,
+  };
+
+  await queueClient.lPush("messageQueue", JSON.stringify(revokeInfo));
 
   res.status(200).json({ message: "deleted successfully" });
   return;
