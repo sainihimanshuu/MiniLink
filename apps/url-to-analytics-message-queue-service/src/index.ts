@@ -1,59 +1,44 @@
-import { createClient } from "redis";
-import { PrismaClient } from "@prisma/client";
+import { initializeConnections, cleanupConnection } from "./connections";
+import worker from "./worker";
 
-const prisma = new PrismaClient();
-let cacheClient: ReturnType<typeof createClient> | null = null;
-let queueClient: ReturnType<typeof createClient> | null = null;
+let isShutdownRunning = false;
 
-const connectToDatabase = async () => {
+const startServer = async () => {
   try {
-    await prisma.$connect();
-    queueClient = createClient();
-    queueClient.on("error", (error) => {
-      console.log(
-        "Redis queue client error in url-to-analytics-message-queue-service",
-        error
-      );
-    });
-    await queueClient.connect();
-    cacheClient = createClient();
-    cacheClient.on("error", (error) => {
-      console.log(
-        "Redis cache client error in url-to-analytics-message-queue-service",
-        error
-      );
-    });
-    await cacheClient.connect();
+    await initializeConnections();
+    worker();
+    console.log("url-to-analytics-message-queue-service running");
   } catch (error) {
-    console.log("Prima/redis connection error", error);
+    console.log(
+      "Error while starting url-to-analytics-message-queue-service",
+      error
+    );
+    process.exit(1);
   }
 };
 
-const exitHandler = async () => {
-  console.log("url-to-analytics-message-queue-service is shutting down");
-  await prisma.$disconnect();
-  if (queueClient) {
-    await queueClient.disconnect();
+const shutdown = (error?: Error) => {
+  if (isShutdownRunning) return;
+  isShutdownRunning = true;
+  if (error) {
+    console.error("Fatal error:", error);
+  } else {
+    console.log("shutting down url-to-analytics-message-queue-service");
   }
-  if (cacheClient) {
-    await cacheClient.disconnect();
-  }
-  process.exit(1);
+  cleanupConnection()
+    .catch((err) => {
+      console.error(
+        "Error during cleanup inside url-to-analytics-message-queue-service:",
+        err
+      );
+      process.exit(1);
+    })
+    .finally(() => process.exit(error ? 1 : 0));
 };
 
-const uncaughtErrorHandler = (error: Error) => {
-  console.error(error);
-  exitHandler().catch((err) =>
-    console.error(
-      "error in url-to-analytics-message-queue-service exit handler",
-      err
-    )
-  );
-};
+process.on("uncaughtException", shutdown);
+process.on("unhandledRejection", shutdown);
+process.on("SIGTERM", shutdown);
+process.on("SIGINT", shutdown);
 
-process.on("uncaughtException", uncaughtErrorHandler);
-process.on("unhandledRejection", uncaughtErrorHandler);
-process.on("SIGTERM", uncaughtErrorHandler);
-process.on("SIGINT", uncaughtErrorHandler);
-
-(async () => await connectToDatabase())();
+startServer();

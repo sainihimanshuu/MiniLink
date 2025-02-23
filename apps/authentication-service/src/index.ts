@@ -1,22 +1,22 @@
 import express from "express";
 import dotenv from "dotenv";
 import authenticationRouter from "./routes/authentication.routes";
-import { PrismaClient } from "@prisma/client";
+import { initializeConnections, cleanupConnection } from "./connections";
 import { Server } from "http";
 import cookieParser from "cookie-parser";
 
 const app = express();
 dotenv.config();
-const prisma = new PrismaClient();
 
 app.use(cookieParser());
 app.use("/api/authentication", authenticationRouter);
 
 let server: Server | null = null;
+let isShutdownRunning = false;
 
-const connectToDatabase = async () => {
+const startServer = async () => {
   try {
-    await prisma.$connect();
+    await initializeConnections();
     server = app.listen(8083, () => {
       console.log("authentication-service listening on 8083");
     });
@@ -25,38 +25,28 @@ const connectToDatabase = async () => {
   }
 };
 
-const exitHandler = async () => {
-  try {
-    if (server) {
-      await new Promise((resolve) => {
-        if (server) {
-          server.close(resolve);
-        }
-      });
-    }
-  } catch (err) {
-    console.error("error in exit handler of authentication-service", err);
+const shutdown = (error?: Error) => {
+  if (isShutdownRunning) return;
+  isShutdownRunning = true;
+  if (error) {
+    console.error("Fatal error:", error);
+  } else {
+    console.log("shutting down authentication-service");
   }
-};
-
-const uncaughtErrorHandler = (error: Error) => {
-  console.error(error);
-  exitHandler()
-    .then(() => process.exit(1))
+  if (server) {
+    server.close();
+  }
+  cleanupConnection()
     .catch((err) => {
-      console.error(
-        "error while hadling process errors in authentication-service",
-        err
-      );
+      console.error("Error during cleanup inside authentication-service:", err);
       process.exit(1);
-    });
+    })
+    .finally(() => process.exit(error ? 1 : 0));
 };
 
-process.on("uncaughtException", uncaughtErrorHandler);
-process.on("unhandledRejection", uncaughtErrorHandler);
-process.on("SIGTERM", uncaughtErrorHandler);
-process.on("SIGINT", uncaughtErrorHandler);
+process.on("uncaughtException", shutdown);
+process.on("unhandledRejection", shutdown);
+process.on("SIGTERM", shutdown);
+process.on("SIGINT", shutdown);
 
-(async () => await connectToDatabase())();
-
-export { prisma };
+startServer();

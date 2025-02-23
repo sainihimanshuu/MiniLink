@@ -15,7 +15,7 @@ model ClickInfo {
   referer    String
   shortUrl   String
   clickDate  DateTime
-  ShortUrl   ShortUrl @relation(fields: [shortUrl], references: [shortUrl])
+  ShortUrl   ShortUrl @relation(fields: [shortUrl], references: [shortUrl], onDelete: Cascade)
 
   @@index([shortUrl])
 }
