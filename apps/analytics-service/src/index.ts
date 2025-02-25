@@ -4,7 +4,9 @@ import cookieParser from "cookie-parser";
 import analyticsRouter from "./routes/analytics.routes";
 import refereshCache from "./workers/refreshCache.worker";
 import { initializeConnections, cleanupConnection } from "./connections";
+import dotenv from "dotenv";
 
+dotenv.config();
 const app = express();
 
 app.use(cookieParser());

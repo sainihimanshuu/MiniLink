@@ -3,7 +3,9 @@ import cookieParser from "cookie-parser";
 import { Server } from "http";
 import urlRouter from "./routes/url.routes";
 import { initializeConnections, cleanupConnection } from "./connections";
+import dotenv from "dotenv";
 
+dotenv.config();
 const app = express();
 app.set("trust proxy", true);
 

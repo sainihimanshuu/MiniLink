@@ -8,7 +8,7 @@ let queueClient: RedisClientType | null = null;
 const initializeConnections = async () => {
   try {
     await prisma.$connect();
-    queueClient = createClient();
+    queueClient = createClient({ url: process.env.QUEUE_CLIENT });
     queueClient.on("error", (error) => {
       console.log(
         "Redis queue client error in url-to-analytics-message-queue-service",
@@ -16,7 +16,7 @@ const initializeConnections = async () => {
       );
     });
     await queueClient.connect();
-    cacheClient = createClient();
+    cacheClient = createClient({ url: process.env.CACHE_CLIENT });
     cacheClient.on("error", (error) => {
       console.log(
         "Redis cache client error in url-to-analytics-message-queue-service",

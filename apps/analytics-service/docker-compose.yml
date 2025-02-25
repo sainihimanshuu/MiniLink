@@ -1,0 +1,36 @@
+services:
+  analytics-service:
+    build:
+      context: .
+      target: runner
+    environment:
+      - DATABASE_URL=postgresql://${ANALYTICS_DB_USER}:${ANALYTICS_DB_PASSWORD}@db_analytics:5432/${ANALYTICS_DB}
+      - CACHE_CLIENT=redis://redis_analytics:6379
+    ports:
+      - "8082:8082"
+    depends_on:
+      - db_analytics
+      - redis_analytics
+
+  db_analytics:
+    image: postgres:alpine
+    environment:
+      POSTGRES_DB: ${ANALYTICS_DB}
+      POSTGRES_USER: ${ANALYTICS_DB_USER}
+      POSTGRES_PASSWORD: ${ANALYTICS_DB_PASSWORD}
+    ports:
+      - "5432:5432"
+    volumes:
+      - db_analytics_data:/var/lib/postgresql/data
+
+  redis_analytics:
+    image: redis:latest
+    command: redis-server --save 20 1
+    ports:
+      - "6372:6379"
+    volumes:
+      - redis_analytics_data:/data
+
+volumes:
+  db_analytics_data:
+  redis_analytics_data:

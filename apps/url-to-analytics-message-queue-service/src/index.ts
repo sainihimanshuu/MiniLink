@@ -1,6 +1,8 @@
 import { initializeConnections, cleanupConnection } from "./connections";
 import worker from "./worker";
+import dotenv from "dotenv";
 
+dotenv.config();
 let isShutdownRunning = false;
 
 const startServer = async () => {

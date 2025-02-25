@@ -1,7 +1,9 @@
-import { cacheClient, prisma } from "..";
+import { getPrismaClient, getCacheClient } from "../connections";
 import { Prisma } from "@prisma/client";
 
 const refereshCache = () => {
+  const prisma = getPrismaClient();
+  const cacheClient = getCacheClient();
   const cacheTypes = [
     "totalClicks",
     "clicksByCountry",

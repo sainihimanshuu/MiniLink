@@ -1,0 +1,11 @@
+services:
+  url-to-analytics-message-queue-service:
+    build:
+      context: .
+      target: runner
+    environment:
+      - DATABASE_URL=postgresql://${ANALYTICS_DB_USER}:${ANALYTICS_DB_PASSWORD}@db_analytics:5432/${ANALYTICS_DB}
+      - CACHE_CLIENT=redis://redis_analytics:6379
+      - QUEUE_CLIENT=redis://redis_queue:6379
+    ports:
+      - "8084:8084"

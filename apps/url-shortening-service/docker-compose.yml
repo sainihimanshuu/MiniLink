@@ -1,0 +1,36 @@
+services:
+  url-shortening-service:
+    build:
+      context: .
+      target: runner
+    environment:
+      - DATABASE_URL=postgresql://${URL_DB_USER}:${URL_DB_PASSWORD}@db_url:5432/${URL_DB}
+      - CACHE_CLIENT=redis://redis_url:6379
+    ports:
+      - "8081:8081"
+    depends_on:
+      - db_url
+      - redis_url
+
+  db_url:
+    image: postgres:alpine
+    environment:
+      POSTGRES_DB: ${URL_DB}
+      POSTGRES_USER: ${URL_DB_USER}
+      POSTGRES_PASSWORD: ${URL_DB_PASSWORD}
+    ports:
+      - "5431:5432"
+    volumes:
+      - db_url_data:/var/lib/postgresql/data
+
+  redis_url:
+    image: redis:latest
+    command: redis-server --save 20 1
+    ports:
+      - "6371:6379"
+    volumes:
+      - redis_url_data:/data
+
+volumes:
+  db_url_data:
+  redis_url_data:

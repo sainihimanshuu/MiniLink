@@ -1,7 +1,9 @@
 import express from "express";
 import proxy from "express-http-proxy";
 import cors from "cors";
+import dotenv from "dotenv";
 
+dotenv.config();
 const app = express();
 app.use(
   cors({
@@ -12,9 +14,9 @@ app.use(
 
 let isShutdownRunning = false;
 
-const urlShortener = proxy("http://localhost:8081");
-const analytics = proxy("http://localhost:8082");
-const authentication = proxy("http://localhost:8083");
+const urlShortener = proxy(process.env.URL_SHORTENING_SERVICE_URL as string);
+const analytics = proxy(process.env.ANALYTICS_SERVICE_URL as string);
+const authentication = proxy(process.env.AUTHENTICATION_SERVICE_URL as string);
 
 app.use("/api/url", urlShortener);
 app.use("/api/analytics", analytics);
