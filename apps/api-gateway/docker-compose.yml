@@ -1,7 +1,8 @@
 services:
   api-gateway:
     build:
-      context: .
+      context: ../../
+      dockerfile: apps/api-gateway/Dockerfile
       target: runner
     environment:
       - ANALYTICS_SERVICE_URL=${ANALYTICS_SERVICE_URL}

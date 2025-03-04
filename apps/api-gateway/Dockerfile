@@ -1,36 +1,24 @@
-FROM node:19-alpine as Base
-RUN npm install -g pnpm
+FROM node:19-alpine AS base
+RUN npm install -g pnpm turbo
 
-FROM Base as builder
-
+FROM base AS builder
 WORKDIR /app
-
 COPY . .
-
 RUN pnpm dlx turbo prune api-gateway --docker
 
-FROM Base as installer
-
+FROM base AS installer
 WORKDIR /app
-
 COPY --from=builder /app/out/json/ .
 COPY --from=builder /app/out/pnpm-lock.yaml ./pnpm-lock.yaml
-
-RUN pnpm install
-
+COPY --from=builder /app/out/pnpm-workspace.yaml ./pnpm-workspace.yaml
+RUN pnpm install --frozen-lockfile
 COPY --from=builder /app/out/full/ .
+RUN turbo run build
 
-RUN pnpm build
-
-FROM Base as runner
-
+FROM base AS runner
 WORKDIR /app
-
-COPY --from=installer /app/dist ./dist
-COPY --from=installer /app/package.json .
-
+COPY --from=installer /app/apps/api-gateway/package.json .
+COPY --from=installer /app/apps/api-gateway/dist ./dist
 RUN pnpm install --prod
-
-EXPOSE 8082
-
+EXPOSE 8080
 CMD ["node", "dist/index.js"]

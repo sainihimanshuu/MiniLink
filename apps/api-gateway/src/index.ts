@@ -14,9 +14,21 @@ app.use(
 
 let isShutdownRunning = false;
 
-const urlShortener = proxy(process.env.URL_SHORTENING_SERVICE_URL as string);
-const analytics = proxy(process.env.ANALYTICS_SERVICE_URL as string);
-const authentication = proxy(process.env.AUTHENTICATION_SERVICE_URL as string);
+const urlShortener = () => {
+  console.log("befor url forward");
+  proxy(process.env.URL_SHORTENING_SERVICE_URL as string);
+  console.log("after url forward");
+};
+const analytics = () => {
+  console.log("befor analytics forward");
+  proxy(process.env.ANALYTICS_SERVICE_URL as string);
+  console.log("after analytics forward");
+};
+const authentication = () => {
+  console.log("befor authentication forward");
+  proxy(process.env.AUTHENTICATION_SERVICE_URL as string);
+  console.log("after authentication forward");
+};
 
 app.use("/api/url", urlShortener);
 app.use("/api/analytics", analytics);
@@ -35,7 +47,7 @@ const shutdown = (error?: Error) => {
     console.log("shutting down url-shortening-service");
   }
   if (server) {
-    server.close();
+    server.close(() => console.log("server close"));
   }
   process.exit(error ? 1 : 0);
 };
