@@ -1,7 +1,7 @@
 import express from "express";
 import dotenv from "dotenv";
-import authenticationRouter from "./routes/authentication.routes";
-import { initializeConnections, cleanupConnection } from "./connections";
+import authenticationRouter from "./routes/authentication.routes.js";
+import { initializeConnections, cleanupConnection } from "./connections.js";
 import { Server } from "http";
 import cookieParser from "cookie-parser";
 

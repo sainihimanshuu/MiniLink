@@ -1,36 +1,22 @@
-FROM node:19-alpine as Base
-RUN npm install -g pnpm
+FROM node:19-alpine AS base
+RUN npm install -g pnpm turbo
 
-FROM Base as builder
-
+FROM base AS builder
 WORKDIR /app
-
 COPY . .
+RUN turbo prune authentication-service --docker
 
-RUN pnpm dlx turbo prune authentication-service --docker
-
-FROM Base as installer
-
+FROM base AS installer
 WORKDIR /app
-
-COPY --from=builder /app/out/json/ .
-COPY --from=builder /app/out/pnpm-lock.yaml ./pnpm-lock.yaml
-
-RUN pnpm install
-
+COPY --from=builder  /app/out/json/ .
+COPY --from=builder  /app/out/pnpm-lock.yaml ./pnpm-lock.yaml
+COPY --from=builder /app/out/pnpm-workspace.yaml ./pnpm-workspace.yaml
+RUN pnpm install --frozen-lockfile
 COPY --from=builder /app/out/full/ .
+RUN turbo run build
 
-RUN pnpm build
-
-FROM Base as runner
-
+FROM base AS runner
 WORKDIR /app
-
-COPY --from=installer /app/dist ./dist
-COPY --from=installer /app/package.json .
-
-RUN pnpm install --prod
-
-EXPOSE 8082
-
-CMD ["node", "dist/index.js"]
+COPY --from=installer ./app .
+EXPOSE 8083
+CMD ["node", "./apps/authentication-service/dist/index.js"]   

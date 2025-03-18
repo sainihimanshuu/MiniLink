@@ -1,14 +1,20 @@
 {
   "name": "@repo/utils",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "tsc"
   },
   "exports": {
-    "./asyncHandler": "./src/asyncHandler.ts",
-    "./verifyJwt": "./src/verifyJwt.ts"
+    "./src/asyncHandler": {
+      "types": "./src/asyncHandler.ts",
+      "default": "./dist/asyncHandler.js"
+    },
+    "./src/verifyJwt": {
+      "types": "./src/verifyJwt.ts",
+      "default": "./dist/verifyJwt.js"
+    }
   },
   "keywords": [],
   "author": "",
@@ -20,6 +26,7 @@
   "dependencies": {
     "jsonwebtoken": "^9.0.2",
     "express": "^4.21.2",
-    "zod": "^3.24.2"
+    "zod": "^3.24.2",
+    "@repo/typescript-config": "workspace:*"
   }
 }

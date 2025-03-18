@@ -1,7 +1,8 @@
 services:
   authentication-service:
     build:
-      context: .
+      context: ../../
+      dockerfile: apps/authentication-service/Dockerfile
       target: runner
     environment:
       - DATABASE_URL=postgresql://${AUTHENTICATION_DB_USER}:${AUTHENTICATION_DB_PASSWORD}@db_authentication:5432/${AUTHENTICATION_DB}

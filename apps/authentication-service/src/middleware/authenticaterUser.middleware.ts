@@ -1,13 +1,14 @@
 import { Request, Response, NextFunction } from "express";
-import jwt from "jsonwebtoken";
-import { prisma } from "../index";
-import { User } from "@prisma/client";
+import { getPrismaClient } from "../connections.js";
+import { User } from "@repo/db-authentication/src/index";
 import asyncHandler from "@repo/utils/src/asyncHandler";
 import verifyJwt from "@repo/utils/src/verifyJwt";
 
 interface AuthRequest extends Request {
   user: User;
 }
+
+const prisma = getPrismaClient();
 
 const userAuthentication = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {

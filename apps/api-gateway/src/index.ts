@@ -15,19 +15,16 @@ app.use(
 let isShutdownRunning = false;
 
 const urlShortener = () => {
-  console.log("befor url forward");
+  console.log(process.env.URL_SHORTENING_SERVICE_URL);
   proxy(process.env.URL_SHORTENING_SERVICE_URL as string);
-  console.log("after url forward");
 };
 const analytics = () => {
-  console.log("befor analytics forward");
+  console.log(process.env.ANALYTICS_SERVICE_URL);
   proxy(process.env.ANALYTICS_SERVICE_URL as string);
-  console.log("after analytics forward");
 };
 const authentication = () => {
-  console.log("befor authentication forward");
+  console.log(process.env.AUTHENTICATION_SERVICE_URL);
   proxy(process.env.AUTHENTICATION_SERVICE_URL as string);
-  console.log("after authentication forward");
 };
 
 app.use("/api/url", urlShortener);

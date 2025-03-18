@@ -4,7 +4,7 @@ RUN npm install -g pnpm turbo
 FROM base AS builder
 WORKDIR /app
 COPY . .
-RUN pnpm dlx turbo prune api-gateway --docker
+RUN turbo prune api-gateway --docker
 
 FROM base AS installer
 WORKDIR /app

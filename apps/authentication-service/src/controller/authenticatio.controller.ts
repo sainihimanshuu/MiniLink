@@ -1,32 +1,29 @@
 import z from "zod";
 import { Request, Response } from "express";
-import { prisma } from "../index";
+import { getPrismaClient } from "../connections.js";
 import asyncHandler from "@repo/utils/src/asyncHandler";
 import bcrypt from "bcrypt";
-import { User } from "@prisma/client";
+import { User } from "@repo/db-authentication/src/index";
 import jwt, { Secret } from "jsonwebtoken";
 
 interface AuthRequest extends Request {
   user: User;
 }
 
-const privateKey = Buffer.from(process.env.PRIVATE_KEY!, "base64").toString(
-  "utf8"
-);
-const publicKey = Buffer.from(process.env.PUBLIC_KEY!, "base64").toString(
-  "utf8"
-);
+const prisma = getPrismaClient();
+const privateKey = process.env.PRIVATE_KEY?.replace(/\\n/g, "\n");
+const publicKey = process.env.PUBLIC_KEY?.replace(/\\n/g, "\n");
 
 const generateAccessAndRefreshToken = async (user: User) => {
   const accessToken = jwt.sign(
     { id: user.id, email: user.email },
     privateKey as Secret,
-    { expiresIn: 60 * 60 }
+    { algorithm: "RS256", expiresIn: 60 * 60 }
   );
   const refreshToken = jwt.sign(
     { id: user.id, email: user.email },
     privateKey as Secret,
-    { expiresIn: "15d" }
+    { algorithm: "RS256", expiresIn: "15d" }
   );
 
   await prisma.user.update({

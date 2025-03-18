@@ -5,10 +5,10 @@ import {
   logOut,
   refreshAccessToken,
   getPublicKey,
-} from "../controller/authenticatio.controller";
-import authenticaterUser from "../middleware/authenticaterUser.middleware";
+} from "../controller/authenticatio.controller.js";
+import authenticaterUser from "../middleware/authenticaterUser.middleware.js";
 
-const router = Router();
+const router: Router = Router();
 
 router.route("/createUser").post(createUser);
 router.route("/loginUser").post(loginUser);

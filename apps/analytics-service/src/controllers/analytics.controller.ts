@@ -1,10 +1,13 @@
-import { prisma, cacheClient } from "../index";
+import { getPrismaClient, getCacheClient } from "../connections";
 import asyncHandler from "@repo/utils/src/asyncHandler";
 import { Request, Response } from "express";
 
 interface AuthRequest extends Request {
   email: string;
 }
+
+const prisma = getPrismaClient();
+const cacheClient = getCacheClient();
 
 const checkAuthorization = async (
   userMail: string,
