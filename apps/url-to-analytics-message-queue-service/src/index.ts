@@ -1,5 +1,5 @@
-import { initializeConnections, cleanupConnection } from "./connections";
-import worker from "./worker";
+import { initializeConnections, cleanupConnection } from "./connections.js";
+import worker from "./worker.js";
 import dotenv from "dotenv";
 
 dotenv.config();

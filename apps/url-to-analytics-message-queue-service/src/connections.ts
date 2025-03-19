@@ -1,5 +1,5 @@
 import { createClient, RedisClientType } from "redis";
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient } from "@repo/db-analytics";
 
 const prisma = new PrismaClient();
 let cacheClient: RedisClientType | null = null;
@@ -32,7 +32,7 @@ const initializeConnections = async () => {
   }
 };
 
-const getPrismaClient = () => {
+const getPrismaClient: any = () => {
   if (!prisma) {
     throw new Error("Run initializeConnections first");
   }

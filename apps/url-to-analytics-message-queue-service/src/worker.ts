@@ -1,6 +1,10 @@
 import { RedisClientType } from "redis";
-import { PrismaClient } from "@prisma/client";
-import { getQueueClient, getCacheClient, getPrismaClient } from "./connections";
+import { PrismaClient } from "@repo/db-analytics";
+import {
+  getQueueClient,
+  getCacheClient,
+  getPrismaClient,
+} from "./connections.js";
 
 interface BaseJobData {
   jobType: "click" | "revokeUrl";
@@ -55,7 +59,7 @@ const newClickToDatabase = async (job: ClickJobData, prisma: PrismaClient) => {
         shortUrl: job.shortUrl,
       },
       update: {
-        ClickInfo: {
+        clickInfo: {
           create: {
             deviceType: job.deviceType,
             city: job.location.city,
@@ -68,7 +72,7 @@ const newClickToDatabase = async (job: ClickJobData, prisma: PrismaClient) => {
       create: {
         shortUrl: job.shortUrl,
         ownerMail: job.urlOwnerMail,
-        ClickInfo: {
+        clickInfo: {
           create: {
             deviceType: job.deviceType,
             city: job.location.city,
