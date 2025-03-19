@@ -2,9 +2,10 @@
   "name": "analytics-service",
   "version": "1.0.0",
   "main": "index.js",
+  "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "tsc --build"
+    "build": "tsc"
   },
   "keywords": [],
   "author": "",
@@ -17,7 +18,9 @@
   },
   "dependencies": {
     "@prisma/client": "6.4.0",
-    "@repo/utils": "workspace:^",
+    "@repo/utils": "workspace:*",
+    "@repo/typescript-config": "workspace:*",
+    "@repo/db-analytics": "workspace:*",
     "@types/cookie-parser": "^1.4.8",
     "cookie-parser": "^1.4.7",
     "express": "^4.21.2",

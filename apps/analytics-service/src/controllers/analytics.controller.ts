@@ -1,19 +1,25 @@
-import { getPrismaClient, getCacheClient } from "../connections";
-import asyncHandler from "@repo/utils/src/asyncHandler";
+import { getPrismaClient, getCacheClient } from "../connections.js";
+import asyncHandler from "@repo/utils/asyncHandler";
 import { Request, Response } from "express";
 
 interface AuthRequest extends Request {
   email: string;
 }
 
-const prisma = getPrismaClient();
-const cacheClient = getCacheClient();
+const getClients = () => {
+  const prisma = getPrismaClient();
+  console.log("before getCache in analytics controller");
+  const cacheClient = getCacheClient();
+
+  return { prisma, cacheClient };
+};
 
 const checkAuthorization = async (
   userMail: string,
   shortUrl: string,
   res: Response
 ) => {
+  const { prisma } = getClients();
   const exist = await prisma.shortUrl.findUnique({
     where: {
       shortUrl: shortUrl,
@@ -30,9 +36,11 @@ const checkAuthorization = async (
   return true;
 };
 
-const totalClicks = asyncHandler(async (req: Request, res, _) => {
+const totalClicks = asyncHandler(async (req: Request, res: Response) => {
+  const { prisma, cacheClient } = getClients();
   const userMail = (req as AuthRequest).email;
   const { shortUrl } = req.params;
+  if (!shortUrl) return;
 
   const inCache = await cacheClient.get(`${shortUrl}:totalClicks`);
   if (inCache) {
@@ -68,8 +76,10 @@ const totalClicks = asyncHandler(async (req: Request, res, _) => {
   return;
 });
 
-const clicksByCountry = asyncHandler(async (req, res, _) => {
+const clicksByCountry = asyncHandler(async (req: Request, res: Response) => {
+  const { prisma, cacheClient } = getClients();
   const { shortUrl } = req.params;
+  if (!shortUrl) return;
   const userMail = (req as AuthRequest).email;
 
   const inCache = await cacheClient.get(`${shortUrl}:clicksByCountry`);
@@ -109,8 +119,10 @@ const clicksByCountry = asyncHandler(async (req, res, _) => {
   return;
 });
 
-const clicksByReferer = asyncHandler(async (req, res, _) => {
+const clicksByReferer = asyncHandler(async (req: Request, res: Response) => {
+  const { prisma, cacheClient } = getClients();
   const { shortUrl } = req.params;
+  if (!shortUrl) return;
   const userMail = (req as AuthRequest).email;
 
   const inCache = await cacheClient.get(`${shortUrl}:clicksByReferer`);
@@ -154,8 +166,10 @@ const clicksByReferer = asyncHandler(async (req, res, _) => {
   return;
 });
 
-const clicksByDeviceType = asyncHandler(async (req, res, _) => {
+const clicksByDeviceType = asyncHandler(async (req: Request, res: Response) => {
+  const { prisma, cacheClient } = getClients();
   const { shortUrl } = req.params;
+  if (!shortUrl) return;
   const userMail = (req as AuthRequest).email;
 
   const inCache = await cacheClient.get(`${shortUrl}:clicksByDeviceType`);

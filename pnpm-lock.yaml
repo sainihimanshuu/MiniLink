@@ -23,8 +23,14 @@ importers:
       '@prisma/client':
         specifier: 6.4.0
         version: 6.4.0(prisma@6.4.0(typescript@5.7.3))(typescript@5.7.3)
+      '@repo/db-analytics':
+        specifier: workspace:*
+        version: link:../../packages/db-analytics
+      '@repo/typescript-config':
+        specifier: workspace:*
+        version: link:../../packages/typescript-config
       '@repo/utils':
-        specifier: workspace:^
+        specifier: workspace:*
         version: link:../../packages/utils
       '@types/cookie-parser':
         specifier: ^1.4.8
@@ -181,6 +187,19 @@ importers:
       prisma:
         specifier: 6.4.1
         version: 6.4.1(typescript@5.7.3)
+
+  packages/db-analytics:
+    dependencies:
+      '@prisma/client':
+        specifier: ^6.5.0
+        version: 6.5.0(prisma@6.5.0(typescript@5.7.3))(typescript@5.7.3)
+      '@repo/typescript-config':
+        specifier: workspace:*
+        version: link:../typescript-config
+    devDependencies:
+      prisma:
+        specifier: ^6.5.0
+        version: 6.5.0(typescript@5.7.3)
 
   packages/db-authentication:
     dependencies:

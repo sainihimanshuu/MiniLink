@@ -1,13 +1,13 @@
 import { Router } from "express";
-import userAuthentication from "../middlewares/userAuthentication.middleware";
+import userAuthentication from "../middlewares/userAuthentication.middleware.js";
 import {
   totalClicks,
   clicksByCountry,
   clicksByReferer,
   clicksByDeviceType,
-} from "../controllers/analytics.controller";
+} from "../controllers/analytics.controller.js";
 
-const router = Router();
+const router: Router = Router();
 
 router.use(userAuthentication);
 router.route("/totalClicks/:shortUrl").get(totalClicks);

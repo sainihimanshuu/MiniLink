@@ -1,6 +1,4 @@
-import { Prisma, PrismaClient } from "@repo/db-authentication/src/index";
-import { DefaultArgs } from "../../../packages/db-authentication/generated/client/runtime/library.js";
-// import { DefaultArgs } from "../../../packages/db-authentication/generated/client/runtime/library";
+import { PrismaClient } from "@repo/db-authentication";
 
 let prisma = new PrismaClient();
 

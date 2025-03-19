@@ -1,8 +1,8 @@
 import { Request, Response, NextFunction } from "express";
 import { getPrismaClient } from "../connections.js";
-import { User } from "@repo/db-authentication/src/index";
-import asyncHandler from "@repo/utils/src/asyncHandler";
-import verifyJwt from "@repo/utils/src/verifyJwt";
+import { User } from "@repo/db-authentication";
+import asyncHandler from "@repo/utils/asyncHandler";
+import verifyJwt from "@repo/utils/verifyJwt";
 
 interface AuthRequest extends Request {
   user: User;

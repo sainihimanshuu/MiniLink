@@ -7,11 +7,11 @@
     "build": "tsc"
   },
   "exports": {
-    "./src/asyncHandler": {
+    "./asyncHandler": {
       "types": "./src/asyncHandler.ts",
       "default": "./dist/asyncHandler.js"
     },
-    "./src/verifyJwt": {
+    "./verifyJwt": {
       "types": "./src/verifyJwt.ts",
       "default": "./dist/verifyJwt.js"
     }

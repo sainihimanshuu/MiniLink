@@ -1,4 +1,4 @@
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient } from "@repo/db-analytics";
 import { createClient, RedisClientType } from "redis";
 
 let prisma = new PrismaClient();
@@ -10,37 +10,37 @@ const initializeConnections = async () => {
     await prisma.$connect();
     queueClient = createClient({ url: process.env.QUEUE_CLIENT });
     queueClient.on("error", (error) => {
-      console.log("Redis queue client error in url-shortening-service", error);
+      console.log("Redis queue client error in analytics", error);
     });
     await queueClient.connect();
     cacheClient = createClient({ url: process.env.CACHE_CLIENT });
     cacheClient.on("error", (error) => {
-      console.log("Redis cache client error in url-shortening-service", error);
+      console.log("Redis cache client error in analytics", error);
     });
     await cacheClient.connect();
   } catch (error) {
-    console.log("Prisma/redis connection error inside url-shortening-service");
+    console.log("Prisma/redis connection error inside analytics");
     throw error;
   }
 };
 
-const getPrismaClient = () => {
+const getPrismaClient: any = () => {
   if (!prisma) {
-    throw new Error("Run initializeConnections first");
+    throw new Error("getPrismaClient: Run initializeConnections first");
   }
   return prisma;
 };
 
 const getQueueClient = () => {
   if (!queueClient) {
-    throw new Error("Run initializeConnections first");
+    throw new Error("getQueueClient: Run initializeConnections first");
   }
   return queueClient;
 };
 
 const getCacheClient = () => {
   if (!cacheClient) {
-    throw new Error("Run initializeConnections first");
+    throw new Error("getCacheClient: Run initializeConnections first");
   }
   return cacheClient;
 };

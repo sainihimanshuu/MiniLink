@@ -1,5 +1,5 @@
-import { getPrismaClient, getCacheClient } from "../connections";
-import { Prisma } from "@prisma/client";
+import { getPrismaClient, getCacheClient } from "../connections.js";
+import { Prisma } from "@repo/db-analytics";
 
 const refereshCache = () => {
   const prisma = getPrismaClient();
@@ -53,7 +53,8 @@ const refereshCache = () => {
               }
             );
           }
-          cacheClient.sRem("recent", recentUrls[i]);
+          //check this, recentUrls[i] might be undefined
+          cacheClient.sRem("recent", recentUrls[i]!);
         }
       } catch (error) {
         console.error("error inside refreshCache worker", error);

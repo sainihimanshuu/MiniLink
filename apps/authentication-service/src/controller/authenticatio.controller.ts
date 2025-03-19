@@ -1,9 +1,9 @@
 import z from "zod";
 import { Request, Response } from "express";
 import { getPrismaClient } from "../connections.js";
-import asyncHandler from "@repo/utils/src/asyncHandler";
+import asyncHandler from "@repo/utils/asyncHandler";
 import bcrypt from "bcrypt";
-import { User } from "@repo/db-authentication/src/index";
+import { User } from "@repo/db-authentication";
 import jwt, { Secret } from "jsonwebtoken";
 
 interface AuthRequest extends Request {

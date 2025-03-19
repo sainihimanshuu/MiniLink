@@ -10,7 +10,7 @@
     "build": "tsc"
   },
   "exports": {
-    "./src/index": {
+    ".": {
       "types": "./src/index.ts",
       "default": "./dist/index.js"
     }

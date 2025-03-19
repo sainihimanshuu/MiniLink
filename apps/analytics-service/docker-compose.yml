@@ -1,7 +1,8 @@
 services:
   analytics-service:
     build:
-      context: .
+      context: ../../
+      dockerfile: apps/analytics-service/Dockerfile
       target: runner
     environment:
       - DATABASE_URL=postgresql://${ANALYTICS_DB_USER}:${ANALYTICS_DB_PASSWORD}@db_analytics:5432/${ANALYTICS_DB}

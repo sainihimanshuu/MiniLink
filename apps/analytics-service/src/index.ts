@@ -1,9 +1,9 @@
 import express from "express";
 import { Server } from "http";
 import cookieParser from "cookie-parser";
-import analyticsRouter from "./routes/analytics.routes";
-import refereshCache from "./workers/refreshCache.worker";
-import { initializeConnections, cleanupConnection } from "./connections";
+import analyticsRouter from "./routes/analytics.routes.js";
+import refereshCache from "./workers/refreshCache.worker.js";
+import { initializeConnections, cleanupConnection } from "./connections.js";
 import dotenv from "dotenv";
 
 dotenv.config();
