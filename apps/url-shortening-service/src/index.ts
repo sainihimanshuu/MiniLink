@@ -1,8 +1,8 @@
 import express from "express";
 import cookieParser from "cookie-parser";
 import { Server } from "http";
-import urlRouter from "./routes/url.routes";
-import { initializeConnections, cleanupConnection } from "./connections";
+import urlRouter from "./routes/url.routes.js";
+import { initializeConnections, cleanupConnection } from "./connections.js";
 import dotenv from "dotenv";
 
 dotenv.config();

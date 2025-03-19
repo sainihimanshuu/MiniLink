@@ -8,8 +8,8 @@ RUN turbo prune authentication-service --docker
 
 FROM base AS installer
 WORKDIR /app
-COPY --from=builder  /app/out/json/ .
-COPY --from=builder  /app/out/pnpm-lock.yaml ./pnpm-lock.yaml
+COPY --from=builder /app/out/json/ .
+COPY --from=builder /app/out/pnpm-lock.yaml ./pnpm-lock.yaml
 COPY --from=builder /app/out/pnpm-workspace.yaml ./pnpm-workspace.yaml
 RUN pnpm install --frozen-lockfile
 COPY --from=builder /app/out/full/ .

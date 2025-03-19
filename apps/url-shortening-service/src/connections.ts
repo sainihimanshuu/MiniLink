@@ -1,4 +1,4 @@
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient } from "@repo/db-url-shortening-service";
 import { createClient, RedisClientType } from "redis";
 
 let prisma = new PrismaClient();
@@ -24,23 +24,23 @@ const initializeConnections = async () => {
   }
 };
 
-const getPrismaClient = () => {
+const getPrismaClient: any = () => {
   if (!prisma) {
-    throw new Error("Run initializeConnections first");
+    throw new Error("getPrismaClient: Run initializeConnections first");
   }
   return prisma;
 };
 
 const getQueueClient = () => {
   if (!queueClient) {
-    throw new Error("Run initializeConnections first");
+    throw new Error("getQueueClient: Run initializeConnections first");
   }
   return queueClient;
 };
 
 const getCacheClient = () => {
   if (!cacheClient) {
-    throw new Error("Run initializeConnections first");
+    throw new Error("getCacheClient: Run initializeConnections first");
   }
   return cacheClient;
 };

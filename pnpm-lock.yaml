@@ -134,8 +134,14 @@ importers:
       '@prisma/client':
         specifier: 6.3.1
         version: 6.3.1(prisma@6.3.1(typescript@5.7.3))(typescript@5.7.3)
+      '@repo/db-url-shortening-service':
+        specifier: 'workspace: *'
+        version: link:../../packages/db-url-shortening-service
+      '@repo/typescript-config':
+        specifier: 'workspace: *'
+        version: link:../../packages/typescript-config
       '@repo/utils':
-        specifier: workspace:^
+        specifier: workspace:*
         version: link:../../packages/utils
       cookie-parser:
         specifier: ^1.4.7
@@ -202,6 +208,19 @@ importers:
         version: 6.5.0(typescript@5.7.3)
 
   packages/db-authentication:
+    dependencies:
+      '@prisma/client':
+        specifier: ^6.5.0
+        version: 6.5.0(prisma@6.5.0(typescript@5.7.3))(typescript@5.7.3)
+      '@repo/typescript-config':
+        specifier: workspace:*
+        version: link:../typescript-config
+    devDependencies:
+      prisma:
+        specifier: ^6.5.0
+        version: 6.5.0(typescript@5.7.3)
+
+  packages/db-url-shortening-service:
     dependencies:
       '@prisma/client':
         specifier: ^6.5.0

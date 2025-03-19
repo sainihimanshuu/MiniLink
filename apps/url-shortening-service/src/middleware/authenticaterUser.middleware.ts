@@ -1,5 +1,5 @@
-import asyncHandler from "@repo/utils/src/asyncHandler";
-import verifyJwt from "@repo/utils/src/verifyJwt";
+import asyncHandler from "@repo/utils/asyncHandler";
+import verifyJwt from "@repo/utils/verifyJwt";
 import { Request, Response, NextFunction } from "express";
 
 interface AuthRequest extends Request {

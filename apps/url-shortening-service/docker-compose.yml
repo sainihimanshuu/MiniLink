@@ -1,7 +1,8 @@
 services:
   url-shortening-service:
     build:
-      context: .
+      context: ../../
+      dockerfile: apps/url-shortening-service/Dockerfile
       target: runner
     environment:
       - DATABASE_URL=postgresql://${URL_DB_USER}:${URL_DB_PASSWORD}@db_url:5432/${URL_DB}

@@ -1,6 +1,10 @@
-import asyncHandler from "@repo/utils/src/asyncHandler";
+import asyncHandler from "@repo/utils/asyncHandler";
 import { customAlphabet } from "nanoid";
-import { prisma, cacheClient, queueClient } from "../index";
+import {
+  getPrismaClient,
+  getCacheClient,
+  getQueueClient,
+} from "../connections.js";
 import { Request } from "express";
 import geoip from "geoip-lite";
 import { UAParser } from "ua-parser-js";
@@ -26,7 +30,16 @@ const genereateShortUrl = () => {
   return shortUrl;
 };
 
+const getClients = () => {
+  const prisma = getPrismaClient();
+  const cacheClient = getCacheClient();
+  const queueClient = getQueueClient();
+
+  return { prisma, cacheClient, queueClient };
+};
+
 const shortenUrl = asyncHandler(async (req, res, _) => {
+  const { prisma } = getClients();
   const longUrl = req.body.longUrl;
   let shortUrl;
 
@@ -70,7 +83,9 @@ const shortenUrl = asyncHandler(async (req, res, _) => {
 });
 
 const redirect = asyncHandler(async (req: Request, res, _) => {
+  const { prisma, cacheClient, queueClient } = getClients();
   const { shortUrl } = req.params;
+  if (!shortUrl) return;
   const { device } = UAParser(req.get("user-agent"));
   const refererHeader = req.get("Referer");
   const ip = req.ip;
@@ -132,6 +147,7 @@ const redirect = asyncHandler(async (req: Request, res, _) => {
 });
 
 const revokeUrl = asyncHandler(async (req, res, _) => {
+  const { prisma, cacheClient, queueClient } = getClients();
   const userMail = (req as AuthRequest).email;
   const { shortUrlToDelete } = req.body;
 
