@@ -19,4 +19,4 @@ FROM base AS runner
 WORKDIR /app
 COPY --from=installer ./app .
 EXPOSE 8082
-CMD ["node", "./apps/analytics-service/dist/index.js"]
+CMD ["pnpm", "--prefix", "apps/analytics-service", "run", "start:migrate:prod"]

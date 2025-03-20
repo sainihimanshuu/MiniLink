@@ -19,4 +19,6 @@ FROM base AS runner
 WORKDIR /app
 COPY --from=installer ./app .
 EXPOSE 8083
-CMD ["node", "./apps/authentication-service/dist/index.js"]   
+# WORKDIR /app/apps/authentication-service
+# CMD ["pnpm", "run", "start:migrate:prod"]  
+CMD ["pnpm", "--prefix", "apps/authentication-service", "run", "start:migrate:prod"]

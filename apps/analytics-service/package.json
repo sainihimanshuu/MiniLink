@@ -5,7 +5,9 @@
   "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "tsc"
+    "build": "tsc",
+    "start:prod": "node ./dist/index.js",
+    "start:migrate:prod": "pnpx prisma migrate deploy --schema=../../packages/db-analytics/prisma/schema.prisma && pnpm run start:prod"
   },
   "keywords": [],
   "author": "",

@@ -1,0 +1,141 @@
+services:
+  analytics-service:
+    build:
+      context: .
+      dockerfile: apps/analytics-service/Dockerfile
+      target: runner
+    environment:
+      - DATABASE_URL=postgresql://${ANALYTICS_DB_USER}:${ANALYTICS_DB_PASSWORD}@db_analytics:5432/${ANALYTICS_DB}
+      - CACHE_CLIENT=redis://redis_analytics:6379
+      - QUEUE_CLIENT=redis://redis_messague_queue:6379
+    env_file:
+      - apps/analytics-service/.env
+    ports:
+      - "8082:8082"
+    depends_on:
+      - db_analytics
+      - redis_analytics
+      - redis_messague_queue
+  api-gateway:
+    build:
+      context: .
+      dockerfile: apps/api-gateway/Dockerfile
+      target: runner
+    env_file:
+      - apps/api-gateway/.env
+    environment:
+      - ANALYTICS_SERVICE_URL=${ANALYTICS_SERVICE_URL}
+      - AUTHENTICATION_SERVICE_URL=${AUTHENTICATION_SERVICE_URL}
+      - URL_SHORTENING_SERVICE_URL=${URL_SHORTENING_SERVICE_URL}
+    ports:
+      - "8080:8080"
+    depends_on:
+      - authentication-service
+      - analytics-service
+      - url-shortening-service
+      - url-to-analytics-messaging-service
+  authentication-service:
+    build:
+      context: .
+      dockerfile: apps/authentication-service/Dockerfile
+      target: runner
+    env_file:
+      - apps/authentication-service/.env
+    environment:
+      - DATABASE_URL=postgresql://${AUTHENTICATION_DB_USER}:${AUTHENTICATION_DB_PASSWORD}@db_authentication:5432/${AUTHENTICATION_DB}
+    ports:
+      - "8083:8083"
+    depends_on:
+      - db_authentication
+  url-shortening-service:
+    build:
+      context: .
+      dockerfile: apps/url-shortening-service/Dockerfile
+      target: runner
+    env_file:
+      - apps/url-shortening-service/.env
+    environment:
+      - DATABASE_URL=postgresql://${URL_DB_USER}:${URL_DB_PASSWORD}@db_url:5432/${URL_DB}
+      - CACHE_CLIENT=redis://redis_url:6379
+      - QUEUE_CLIENT=redis://redis_messague_queue:6379
+    ports:
+      - "8081:8081"
+    depends_on:
+      - db_url
+      - redis_url
+      - redis_messague_queue
+  url-to-analytics-messaging-service:
+    build:
+      context: .
+      dockerfile: apps/url-to-analytics-message-queue-service/Dockerfile
+      target: runner
+    env_file:
+      - apps/url-to-analytics-message-queue-service/.env
+    environment:
+      - DATABASE_URL=postgresql://${ANALYTICS_DB_USER}:${ANALYTICS_DB_PASSWORD}@db_analytics:5432/${ANALYTICS_DB}
+      - CACHE_CLIENT=redis://redis_analytics:6379
+      - QUEUE_CLIENT=redis://redis_messague_queue:6379
+    ports:
+      - "8084:8084"
+    depends_on:
+      - analytics-service
+      - redis_messague_queue
+  db_authentication:
+    image: postgres:alpine
+    environment:
+      POSTGRES_DB: ${AUTHENTICATION_DB}
+      POSTGRES_USER: ${AUTHENTICATION_DB_USER}
+      POSTGRES_PASSWORD: ${AUTHENTICATION_DB_PASSWORD}
+    ports:
+      - "5433:5432"
+    volumes:
+      - db_authentication_data:/var/lib/postgresql/data
+  db_url:
+    image: postgres:alpine
+    environment:
+      POSTGRES_DB: ${URL_DB}
+      POSTGRES_USER: ${URL_DB_USER}
+      POSTGRES_PASSWORD: ${URL_DB_PASSWORD}
+    ports:
+      - "5431:5432"
+    volumes:
+      - db_url_data:/var/lib/postgresql/data
+  db_analytics:
+    image: postgres:alpine
+    environment:
+      POSTGRES_DB: ${ANALYTICS_DB}
+      POSTGRES_USER: ${ANALYTICS_DB_USER}
+      POSTGRES_PASSWORD: ${ANALYTICS_DB_PASSWORD}
+    ports:
+      - "5432:5432"
+    volumes:
+      - db_analytics_data:/var/lib/postgresql/data
+  redis_analytics:
+    image: redis:latest
+    command: redis-server --save 20 1
+    ports:
+      - "6372:6379"
+    volumes:
+      - redis_analytics_data:/data
+  redis_url:
+    image: redis:latest
+    command: redis-server --save 20 1
+    ports:
+      - "6371:6379"
+    volumes:
+      - redis_url_data:/data
+  redis_messague_queue:
+    image: redis:latest
+    command: redis-server --save 20 1
+    ports:
+      - "6370:6379"
+    volumes:
+      - redis_message_queue_data:/data
+
+volumes:
+  db_analytics_data:
+  redis_analytics_data:
+  db_url_data:
+  redis_url_data:
+  db_authentication_data:
+  redis_message_queue_data:

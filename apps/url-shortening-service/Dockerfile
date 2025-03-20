@@ -19,4 +19,4 @@ FROM base AS runner
 WORKDIR /app
 COPY --from=installer ./app .
 EXPOSE 8081
-CMD ["node", "./apps/url-shortening-service/dist/index.js"]
+CMD ["pnpm", "--prefix", "apps/url-shortening-service", "run", "start:migrate:prod"]
