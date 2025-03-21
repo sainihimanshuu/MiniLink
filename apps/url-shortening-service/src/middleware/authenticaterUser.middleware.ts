@@ -8,7 +8,7 @@ interface AuthRequest extends Request {
 
 const authenticateUser = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
-    const accessToken = req.get("Bearer")?.split(" ")[1];
+    const accessToken = req.get("Authorization")?.split(" ")[1];
     if (!accessToken) {
       res.status(401).send("unauthorized access");
       return;

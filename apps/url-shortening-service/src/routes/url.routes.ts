@@ -9,7 +9,7 @@ import authenticaterUser from "../middleware/authenticaterUser.middleware.js";
 const router: Router = Router();
 
 router.route("/shorten").post(authenticaterUser, shortenUrl);
-router.route("/:shortUrl").post(redirect);
+router.route("/:shortUrl").get(redirect);
 router.route("/revoke").delete(authenticaterUser, revokeUrl);
 
 export default router;

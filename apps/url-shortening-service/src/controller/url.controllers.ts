@@ -41,6 +41,13 @@ const getClients = () => {
 const shortenUrl = asyncHandler(async (req, res, _) => {
   const { prisma } = getClients();
   const longUrl = req.body.longUrl;
+  const expression =
+    /[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)/gi;
+  const regex = new RegExp(expression);
+  if (!regex.test(longUrl)) {
+    res.status(400).json({ message: "invalid url" });
+    return;
+  }
   let shortUrl;
 
   while (true) {
@@ -142,7 +149,7 @@ const redirect = asyncHandler(async (req: Request, res, _) => {
 
   await queueClient.lPush("messageQueue", JSON.stringify(clickInfo));
 
-  res.redirect(urlInfo.longUrl);
+  res.status(302).redirect(urlInfo.longUrl);
   return;
 });
 
