@@ -100,7 +100,7 @@ const clicksByCountry = asyncHandler(async (req: Request, res: Response) => {
   const clicksByCountry = await prisma.clickInfo.groupBy({
     by: ["country"],
     where: { shortUrl: shortUrl },
-    _count: { country: true },
+    _count: true,
   });
 
   cacheClient.set(
@@ -145,9 +145,7 @@ const clicksByReferer = asyncHandler(async (req: Request, res: Response) => {
     where: {
       shortUrl: shortUrl,
     },
-    _count: {
-      referer: true,
-    },
+    _count: true,
   });
 
   cacheClient.set(
@@ -192,9 +190,7 @@ const clicksByDeviceType = asyncHandler(async (req: Request, res: Response) => {
     where: {
       shortUrl: shortUrl,
     },
-    _count: {
-      deviceType: true,
-    },
+    _count: true,
   });
 
   cacheClient.set(
