@@ -46,6 +46,12 @@ const createUserSchema = z.object({
 
 const createUser = asyncHandler(async (req, res, _) => {
   const parsedData = createUserSchema.parse(req.body);
+  if (!parsedData.email) {
+    res.status(400).json({ message: "no email present" });
+  }
+  if (!parsedData.password) {
+    res.status(400).json({ message: "no password present" });
+  }
 
   const emailExists = await prisma.user.findFirst({
     where: { email: parsedData.email },
@@ -187,7 +193,7 @@ const getPublicKey = (req: Request, res: Response) => {
     return;
   }
 
-  res.json({ publicKey: publicKey });
+  res.status(200).json({ publicKey: publicKey });
 };
 
 export { createUser, loginUser, logOut, refreshAccessToken, getPublicKey };
