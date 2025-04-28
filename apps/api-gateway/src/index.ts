@@ -15,21 +15,20 @@ app.use(
 let isShutdownRunning = false;
 
 const urlShortener = () => {
-  console.log(process.env.URL_SHORTENING_SERVICE_URL);
-  proxy(process.env.URL_SHORTENING_SERVICE_URL as string);
-};
-const analytics = () => {
-  console.log(process.env.ANALYTICS_SERVICE_URL);
-  proxy(process.env.ANALYTICS_SERVICE_URL as string);
-};
-const authentication = () => {
-  console.log(process.env.AUTHENTICATION_SERVICE_URL);
-  proxy(process.env.AUTHENTICATION_SERVICE_URL as string);
+  return proxy(process.env.URL_SHORTENING_SERVICE_URL as string);
 };
 
-app.use("/api/url", urlShortener);
-app.use("/api/analytics", analytics);
-app.use("/api/authentication", authentication);
+const analytics = () => {
+  return proxy(process.env.ANALYTICS_SERVICE_URL as string);
+};
+
+const authentication = () => {
+  return proxy(process.env.AUTHENTICATION_SERVICE_URL as string);
+};
+
+app.use("/api/url", urlShortener());
+app.use("/api/analytics", analytics());
+app.use("/api/authentication", authentication());
 
 const server = app.listen(8080, () => {
   console.log("api gateway listening at 8080");
@@ -53,3 +52,5 @@ process.on("uncaughtException", shutdown);
 process.on("unhandledRejection", shutdown);
 process.on("SIGINT", shutdown);
 process.on("SIGTERM", shutdown);
+
+export default app;

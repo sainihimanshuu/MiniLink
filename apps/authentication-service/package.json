@@ -8,9 +8,6 @@
     "start:prod": "node ./dist/index.js",
     "start:migrate:prod": "pnpx prisma migrate deploy --schema=../../packages/db-authentication/prisma/schema.prisma && pnpm run start:prod"
   },
-  "jest": {
-    "verbose": true
-  },
   "keywords": [],
   "author": "",
   "license": "ISC",
